@@ -2,6 +2,21 @@
     "name": "???",
     "short_name": "???",
     "theme color": "#ffffff",
+    "background_color": "#01579b",
+    "start_url": "/index.html",
+    "display": "standalone",
     
+    "icons": [
+        {
+            "src": "assests/icons/icon_512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "assests/icons/icon_512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 
 }
