@@ -25,3 +25,15 @@ request.onerror = function(event) {
     //log error
     console.log(event.target.errorCode);
 };
+
+//func executed if attempting to submit new budget w/no connect
+function saveRecord(record) {
+    //open new transaction w/db w/read&write permissions
+    const transaction = db.transaction(['new_budget'], 'readwrite');
+
+    //access object store for 'new_budget'
+    const budgetObjectStore = transaction.objectStore('new_budget');
+
+    //add record to store w/add method
+    budgetObjectStore.add(record);
+}
