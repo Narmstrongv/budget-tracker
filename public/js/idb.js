@@ -1,6 +1,3 @@
-const { response } = require("express");
-const { get } = require("mongoose");
-
 //vari to hold db connect
 let db;
 //establish connect to IndexDB called 'b-t' & set to ver 1
