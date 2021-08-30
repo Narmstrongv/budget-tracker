@@ -1,3 +1,6 @@
+const { response } = require("express");
+const { get } = require("mongoose");
+
 //vari to hold db connect
 let db;
 //establish connect to IndexDB called 'b-t' & set to ver 1
@@ -17,7 +20,7 @@ request.onsuccess = function(event) {
 
     //check if app online, if Y run uploadBudget() to send all local db data to api
     if (navigator.onLine) {
-        //uploadBudget();
+        uploadBudget();
     }
 };
 
@@ -37,3 +40,49 @@ function saveRecord(record) {
     //add record to store w/add method
     budgetObjectStore.add(record);
 }
+
+function uploadBudget() {
+    //open transaction to db
+    const transaction = db.transaction(['new_budget'], 'readwrite');
+
+    //access object store
+    const budgetObjectStore = transaction.objectStore('new_budget');
+
+    //get all records from store, & set to vari
+    const getAll = budgetObjectStore.getAll();
+
+    //upon successful .getAll exec, run this func
+    getAll.onsuccess = function() {
+        //if there is data in indexDB's store, send it to api server
+        if (getAll.result.length > 0) {
+            fetch('/api/transaction', {
+                method: 'POST',
+                body: JSON.stringify(getAll.result),
+                headers: {
+                    Accept: 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(serverResponse => {
+                    if (serverResponse.message) {
+                        throw new Error(serverResponse);
+                    }
+                    //open 1 more transac
+                    const transaction = db.transaction(['new_budget'], 'readwrite');
+                    //access new_budget object store 
+                    const budgetObjectStore = transaction.objectStore('new_budget');
+                    //clear all items in store
+                    budgetObjectStore.clear();
+
+                    alert('All saved budgets have been submitted!');
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+    };
+}
+
+//listen for app coming back online
+window.addEventListener('online', uploadBudget);
